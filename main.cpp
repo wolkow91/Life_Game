@@ -67,12 +67,6 @@ void init_my_fields(void)
 			array_field[i][j].right_low.x=(i+1)*step;
 			array_field[i][j].right_low.y=(j+1)*step;
 
-		//	time_array_field[i][j].left_low = array_field[i][j].left_low;	
-		//	time_array_field[i][j].left_high = array_field[i][j].left_high;	
-		//	time_array_field[i][j].right_high = array_field[i][j].right_high;	
-		//	time_array_field[i][j].right_low = array_field[i][j].right_low;
-
-
 			if (i==0) //верxние для первой строки
 			{
 				array_field[i][j].friends[1] = &array_field[x_val-2][j];
