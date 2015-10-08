@@ -1,7 +1,5 @@
 #include <GL/glut.h>
 #include <time.h>
-#include <iostream>
-using namespace std;
 
 struct vertex
 {
@@ -41,7 +39,7 @@ const double step_x = 1.0/(x_val-1);
 const double step_y = 1.0/(y_val-1);
 
 //прочие глобальные переменные
-bool stop_key;
+bool stop_key, mode_bw = true; //стоп-ключ и черно-белый режим
 int speed_x = 0;
 
 //глобальный массив структур field - наше игровое поле
@@ -55,8 +53,6 @@ int mx, my; //координаты мыши
 
 void init_my_fields(void)
 {	
-	int i, j;
-
 	for (int i = 0; i < x_val-1; i++)
 	{
 		//инициализация указателей на соседей
@@ -137,7 +133,7 @@ void init_my_fields(void)
 					{
 						array_field[i][j].friends[5] = &array_field[i+1][y_val-2];
 					}else{		//остальные строки
-					array_field[i][j].friends[5] = &array_field[i+1][j-1];
+						array_field[i][j].friends[5] = &array_field[i+1][j-1];
 					}
 				}
 			}
@@ -154,7 +150,7 @@ void init_my_fields(void)
 					{
 						array_field[i][j].friends[7] = &array_field[i+1][0];
 					}else{		//остальные строки
-					array_field[i][j].friends[7] = &array_field[i+1][j+1];
+						array_field[i][j].friends[7] = &array_field[i+1][j+1];
 					}
 				}
 			}
@@ -171,7 +167,7 @@ void init_my_fields(void)
 					{
 						array_field[i][j].friends[2] = &array_field[i-1][0];
 					}else{		//остальные строки
-					array_field[i][j].friends[2] = &array_field[i-1][j+1];
+						array_field[i][j].friends[2] = &array_field[i-1][j+1];
 					}
 				}
 			}
@@ -183,17 +179,7 @@ void init_my_fields(void)
 	{
 		for (int j = 0; j < y_val-2; j++)
 		{
-		//	if (j==0 || j== 13)
-		//	{
-		//		if(i!=1 || i!=15){
-		//			array_field[i][j].white = true;
-		//		}else{
-		//			array_field[i][j].white = false;
-		//		}
-		//	}
-		//	else{
-					array_field[i][j].white = false;
-		//		}
+			array_field[i][j].white = false;
 		}
 	}
 }
@@ -218,7 +204,7 @@ void my_draw(void){
 					white_now = 1.0;
 				}
 				
-				if (array_field[i][j].white)
+				if (array_field[i][j].white && mode_bw)
 				{
 					glColor3f(array_field[i][j].rgb.R, array_field[i][j].rgb.G, array_field[i][j].rgb.B);
 				}else{
@@ -243,14 +229,12 @@ void my_draw(void){
 		{
 			glVertex2d(array_field[i][0].left_high.x, array_field[i][0].left_high.y);
 			glVertex2d(array_field[i][y_val-2].right_high.x, array_field[i][y_val-2].right_high.y);
-			
 		}
 
 		for (int j = 0; j < y_val-1; j++)
 		{
 			glVertex2d(array_field[0][j].left_high.x, array_field[0][j].left_high.y);
 			glVertex2d(array_field[x_val-2][j].left_low.x, array_field[x_val-2][j].left_low.y);
-			
 		}
 	glEnd();	
 
@@ -309,7 +293,6 @@ void transform(void){
 }
 
 void new_occupant(void){
-	double rand_num;
 	int str_ix, col_ix; //координаты нового жителя
 	str_ix = rand() % (x_val-1);
 	col_ix = rand() % (y_val-1);
@@ -321,11 +304,23 @@ void new_occupant(void){
 }
 
 void kill_someone(void){
-	double rand_num;
 	int str_ix, col_ix; //координаты жителя
 	str_ix = rand() % (x_val-1);
 	col_ix = rand() % (y_val-1);
 	array_field[str_ix][col_ix].white = false;
+}
+
+void kill_alls(void){
+	for (int im = 0; im < x_val-1; im++)
+	{
+		for (int jm = 0; jm < y_val-1; jm++)
+		{
+			array_field[im][jm].rgb.R = 1.0;
+			array_field[im][jm].rgb.G = 1.0;
+			array_field[im][jm].rgb.B = 1.0;
+			array_field[im][jm].white = false;
+		}
+	}
 }
 
 void click_mouse(bool kill){
@@ -369,6 +364,12 @@ void processNormalKeys(unsigned char key, int x, int y) {
 		case 102: //клавиша f
 			kill_someone();
 			break;	
+		case 99: //клавиша с
+			kill_alls();
+			break;
+		case 115:
+			mode_bw = !mode_bw;
+			break;		
 		}	
 }
 
